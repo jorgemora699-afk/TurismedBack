@@ -1,77 +1,65 @@
-# Turismed - Sistema de Recomendaciones
+# 📱 App Móvil - Lugares y Recomendaciones
 
-API REST construida con **Clean Architecture** para sistema de recomendaciones de lugares según preferencias de usuario.
-
-## 🏗️ Arquitectura
-
-Proyecto implementado siguiendo los principios de **Clean Architecture (Uncle Bob)**:
-```
-├── domain/              # Entidades y Casos de Uso (Lógica de Negocio)
-├── application/         # Controllers y Repository Interfaces
-├── infrastructure/      # Flask, PostgreSQL (Detalles técnicos)
-├── presentation/        # Interfaz Web (HTML, CSS, JS)
-└── config.py           # Configuración
-```
-
-## 🚀 Tecnologías
-
-- **Backend:** Python 3.14, Flask
-- **Base de datos:** PostgreSQL
-- **Seguridad:** bcrypt
-- **Frontend:** HTML, CSS, JavaScript
-
-## 📋 Funcionalidades
-
-### API de Usuarios
-- ✅ Registro de usuarios
-- ✅ Login con autenticación
-- ✅ CRUD completo de usuarios
-
-### API del Cuestionario
-- ✅ 6 preguntas sobre preferencias
-- ✅ Asignación automática de categoría
-- ✅ Sistema de scoring por palabras clave
-
-### Categorías
-- Foodies
-- Fiesteros
-- Románticos
-- Casuales
-- Gourmet Nocturnos
+Aplicación móvil para descubrir lugares según el perfil del usuario (restaurantes, bares, discotecas, cafés). Incluye cuestionario de preferencias, sistema de categorías y promociones.
 
 
-### Usuarios
-```
-POST   /users/register           - Registrar usuario
-POST   /users/login              - Login
-GET    /users/:id                - Obtener usuario
-PATCH  /users/:id                - Actualizar usuario
-DELETE /users/:id                - Eliminar usuario
+## ⚙️ Backend (Flask + PostgreSQL)
+
+### Requisitos previos
+
+- Python 3.10+
+- PostgreSQL 14+
+
+
+
+### Instalar dependencias
+
+```bash
+pip install -r requirements.txt
 ```
 
-### Cuestionario
-```
-GET    /questionnaire/questions              - Obtener preguntas
-POST   /questionnaire/submit                 - Enviar respuestas
-GET    /questionnaire/user/:user_id          - Ver respuestas
-```
+### 5. Crear la base de datos
 
-### Interfaz Web
-```
-GET    /web                      - Login
-GET    /web/register             - Registro
-GET    /web/questionnaire        - Cuestionario
-GET    /web/recommendations      - Recomendaciones
-GET    /web/profile              - Perfil
+```bash
+# Conectarse a PostgreSQL
+psql -U postgres
+
+# Crear la base de datos
+CREATE DATABASE nombre_de_tu_base_de_datos;
+\q
 ```
 
+### 6. Ejecutar el script SQL
+
+```bash
+psql -U postgres -d nombre_de_tu_base_de_datos -f database_setup.sql
+```
+
+Esto creará todas las tablas e insertará los datos iniciales (categorías, preguntas, lugares y promociones).
 
 
-## 📝 Próximas funcionalidades
+## 📦 Dependencias del backend
 
-- [ ] API de Lugares
-- [ ] API de Recomendaciones
-- [ ] API de Promociones
-- [ ] Autenticación JWT
-- [ ] App móvil con React Native
+| Paquete | Versión | Uso |
+|---|---|---|
+| Flask | 3.1.0 | Framework web |
+| Flask-CORS | 5.0.1 | Manejo de CORS |
+| psycopg2-binary | 2.9.10 | Conexión a PostgreSQL |
+| bcrypt | 4.3.0 | Hash de contraseñas |
+| PyJWT | 2.10.1 | Autenticación con tokens JWT |
+| python-dotenv | 1.0.1 | Variables de entorno |
 
+
+
+## 🗃️ Estructura de la base de datos
+
+| Tabla | Descripción |
+|---|---|
+| `users` | Usuarios registrados |
+| `categories` | Categorías de perfil (Foodies, Fiesteros, etc.) |
+| `questions` | Preguntas del cuestionario de preferencias |
+| `question_options` | Opciones de respuesta por pregunta |
+| `user_answers` | Respuestas del usuario al cuestionario |
+| `places` | Lugares (restaurantes, bares, discotecas, cafés) |
+| `promotions` | Códigos promocionales con descuento |
+| `redemptions` | Registro de promociones usadas por usuario |
