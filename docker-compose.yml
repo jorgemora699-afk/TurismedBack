@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: turismed_db
+    environment:
+      POSTGRES_DB: Turismed_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1605
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+
+  api:
+    build: .
+    container_name: turismed_api
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: db
+      DB_NAME: Turismed_db
+      DB_USER: postgres
+      DB_PASSWORD: 1605
+      DB_PORT: 5432
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
