@@ -31,9 +31,6 @@ wheels/
 *~
 
 # Configuración sensible
-config.py
-*.env
-.env
 
 # Base de datos
 *.db
