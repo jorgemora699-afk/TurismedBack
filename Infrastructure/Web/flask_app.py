@@ -92,7 +92,8 @@ def create_app():
     # Crear el controller de recomendaciones
     recommendation_controller = RecommendationController(
         user_repository,      # Reutilizamos
-        place_repository      # Reutilizamos
+        place_repository,      # Reutilizamos
+        questionnaire_repository
     )
 
     # 4️⃣ DEFINIR LAS RUTAS HTTP
