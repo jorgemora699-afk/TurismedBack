@@ -41,7 +41,8 @@ class GetRecommendationsUseCase:
 
         # Traer respuestas del usuario para filtrar
         user_answers = self.questionnaire_repository.get_user_answers(user_id)
-        answers_map = {a.question_id: a.answer_text.lower() for a in user_answers}
+        # ✅ FIX: str() protege contra campos que lleguen como int desde la DB
+        answers_map = {a.question_id: str(a.answer_text).lower() for a in user_answers}
 
         # Extraer preferencias clave
         # Q6 = presupuesto, Q4 = horario
@@ -72,12 +73,14 @@ class GetRecommendationsUseCase:
             price_ok = (
                 budget_filter is None or
                 place.price_range is None or
-                place.price_range.lower() == budget_filter
+                # ✅ FIX: str() protege contra price_range que llegue como int
+                str(place.price_range).lower() == budget_filter
             )
             schedule_ok = (
                 schedule_filter is None or
                 place.opening_hours is None or
-                schedule_filter in place.opening_hours.lower()
+                # ✅ FIX: str() protege contra opening_hours que llegue como int
+                schedule_filter in str(place.opening_hours).lower()
             )
             if price_ok and schedule_ok:
                 filtered.append(place)
