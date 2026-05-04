@@ -104,89 +104,81 @@ class SubmitQuestionnaireUseCase:
 
     def _assign_category(self, answers: List[UserAnswer]) -> Category:
         """
-        Lógica para asignar una categoría según las respuestas
+        Asigna categoría según las nuevas opciones del cuestionario.
 
-        Esta es una lógica simplificada basada en palabras clave.
-        En producción podrías usar ML, scoring más complejo, etc.
-
-        Args:
-            answers: Lista de respuestas del usuario
-
-        Returns:
-            Category: Categoría asignada
+        Categorías:
+        1 - Foodies
+        2 - Fiesteros  
+        3 - Románticos
+        4 - Casuales
+        5 - Gourmet Nocturnos
         """
 
-        # Obtener todas las categorías disponibles
         categories = self.questionnaire_repository.get_all_categories()
-
-        # Convertir respuestas a minúsculas para análisis
         answers_text = " ".join([a.answer_text.lower() for a in answers])
 
-        # Sistema de puntuación por categoría
-        scores = {
-            1: 0,  # Foodies
-            2: 0,  # Fiesteros
-            3: 0,  # Románticos
-            4: 0,  # Casuales
-            5: 0   # Gourmet Nocturnos
-        }
+        scores = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
 
-        # Reglas de puntuación basadas en palabras clave
-
-        # FOODIES - Pregunta 3 (comida) + ambiente tranquilo
-        if any(word in answers_text for word in ['italiana', 'asiática', 'gourmet', 'internacional']):
+        # --- FOODIES (1) ---
+        # Le importa la comida y el ambiente tranquilo
+        if any(w in answers_text for w in ['restaurante casual', 'cocina internacional', 'alta cocina']):
             scores[1] += 2
-        if 'tranquilo' in answers_text:
+        if 'tranquilo y relajado' in answers_text:
+            scores[1] += 2
+        if any(w in answers_text for w in ['solo', 'en pareja']):
             scores[1] += 1
 
-        # FIESTEROS - Música animada + ambiente bullicioso + fin de semana
-        if any(word in answers_text for word in ['electrónica', 'reggaeton', 'salsa']):
+        # --- FIESTEROS (2) ---
+        # Música animada, ambiente de fiesta, noche
+        if any(w in answers_text for w in ['reggaetón / urbana', 'salsa / bachata']):
             scores[2] += 2
-        if 'bullicioso' in answers_text or 'animado' in answers_text:
+        if 'ambiente de fiesta' in answers_text:
+            scores[2] += 3
+        if 'modo noche' in answers_text:
             scores[2] += 2
-        if 'fin de semana' in answers_text:
+        if 'con amigos' in answers_text:
             scores[2] += 1
 
-        # ROMÁNTICOS - Ambiente romántico + en pareja
+        # --- ROMÁNTICOS (3) ---
+        # Ambiente romántico + en pareja
         if 'romántico' in answers_text:
             scores[3] += 3
-        if 'pareja' in answers_text:
-            scores[3] += 2
-        # Presupuesto
-        if any(word in answers_text for word in ['medio', 'alto']):
+        if 'en pareja' in answers_text:
+            scores[3] += 3
+        if any(w in answers_text for w in ['medio', 'alto']):
+            scores[3] += 1
+        if 'durante la tarde' in answers_text:
             scores[3] += 1
 
-        # CASUALES - Cualquier día + con amigos + económico
-        if 'cualquier' in answers_text:
+        # --- CASUALES (4) ---
+        # Relajados, con amigos o familia, presupuesto bajo
+        if 'a cualquier hora, sin reglas' in answers_text:
             scores[4] += 2
-        if 'amigos' in answers_text:
+        if any(w in answers_text for w in ['con amigos', 'en familia']):
             scores[4] += 2
-        if 'económico' in answers_text:
+        if 'bajo' in answers_text:
+            scores[4] += 2
+        if 'variada' in answers_text:
             scores[4] += 1
 
-        # GOURMET NOCTURNOS - Buena comida + vida nocturna
-        if any(word in answers_text for word in ['italiana', 'asiática', 'gourmet']):
-            scores[5] += 1
-        if any(word in answers_text for word in ['jazz', 'rock']):
-            scores[5] += 1
-        if 'bullicioso' in answers_text or 'animado' in answers_text:
-            scores[5] += 1
-        if 'alto' in answers_text:  # Presupuesto alto
+        # --- GOURMET NOCTURNOS (5) ---
+        # Buena comida + noche + presupuesto alto
+        if any(w in answers_text for w in ['alta cocina', 'cocina internacional']):
             scores[5] += 2
+        if any(w in answers_text for w in ['rock', 'variada']):
+            scores[5] += 1
+        if 'modo noche' in answers_text:
+            scores[5] += 2
+        if 'alto' in answers_text:
+            scores[5] += 3
 
-        # Obtener la categoría con mayor puntuación
+        # Asignar categoría con mayor puntaje
         max_score = max(scores.values())
+        assigned_category_id = 4 if max_score == 0 else max(scores, key=scores.get)
 
-        # Si todas tienen 0 puntos, asignar "Casuales" por defecto
-        if max_score == 0:
-            assigned_category_id = 4  # Casuales
-        else:
-            assigned_category_id = max(scores, key=scores.get)
-
-        # Buscar la categoría en la lista
         assigned_category = next(
             (cat for cat in categories if cat.id == assigned_category_id),
-            categories[3]  # Casuales por defecto si no se encuentra
+            categories[3]
         )
 
         return assigned_category

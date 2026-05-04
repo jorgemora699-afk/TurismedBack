@@ -16,8 +16,12 @@ class RecommendationController:
     Controlador de recomendaciones
     """
 
-    def __init__(self, user_repository: UserRepository,
-                 place_repository: PlaceRepository):
+    def __init__(self, user_repository, place_repository, questionnaire_repository):
+        self.get_recommendations_use_case = GetRecommendationsUseCase(
+            user_repository,
+            place_repository,
+            questionnaire_repository
+        )
         """
         Constructor
 
@@ -28,7 +32,8 @@ class RecommendationController:
         # Crear el Use Case
         self.get_recommendations_use_case = GetRecommendationsUseCase(
             user_repository,
-            place_repository
+            place_repository,
+            questionnaire_repository  # ← nuevo
         )
 
     def get_recommendations(self, user_id):
