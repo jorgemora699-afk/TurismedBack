@@ -15,6 +15,7 @@ Responsabilidades:
 3. Encapsular lógica relacionada con usuarios
 """
 
+import re
 
 class User:
     """
@@ -64,17 +65,52 @@ class User:
         if len(self.name.strip()) > 100:
             raise ValueError("Name cannot exceed 100 characters")
 
-        # Validar email
+        # ✅ VALIDACIÓN MEJORADA DE EMAIL
         if not self.email:
             raise ValueError("Email is required")
 
-        email_lower = self.email.lower().strip()
-        if '@' not in email_lower or '.' not in email_lower:
-            raise ValueError("Email must be a valid email address")
-
-        # Validar contraseña (solo si está presente y NO está hasheada)
+        email_clean = self.email.strip().lower()
+        
+        # Patrón de expresión regular para email válido
+        email_pattern = r'^[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9]@[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9]\.[a-zA-Z]{2,}$'
+        
+        if not re.match(email_pattern, email_clean):
+            raise ValueError("Invalid email format. Please use a valid email like example@domain.com")
+        
+        # Validaciones adicionales
+        # 1. No permitir emails que empiecen o terminen con punto
+        if email_clean.startswith('.') or email_clean.endswith('.'):
+            raise ValueError("Email cannot start or end with a dot")
+        
+        # 2. No permitir puntos consecutivos
+        if '..' in email_clean:
+            raise ValueError("Email cannot contain consecutive dots")
+        
+        # 3. Validar que tenga @ en el lugar correcto
+        if email_clean.count('@') != 1:
+            raise ValueError("Email must contain exactly one @ symbol")
+        
+        # 4. Validar que la parte local (antes del @) tenga contenido
+        local_part, domain_part = email_clean.split('@')
+        
+        if len(local_part) < 1:
+            raise ValueError("Email must have content before @")
+        
+        if len(domain_part) < 3:
+            raise ValueError("Email domain is too short")
+        
+        # 5. Validar que el dominio tenga al menos un punto
+        if '.' not in domain_part:
+            raise ValueError("Email domain must contain at least one dot")
+        
+        # 6. Validar que después del último punto haya al menos 2 caracteres
+        domain_extension = domain_part.split('.')[-1]
+        if len(domain_extension) < 2:
+            raise ValueError("Email domain extension must be at least 2 characters")
+        
+            # Validar contraseña (solo si está presente y NO está hasheada)
         if not self.password:
-            raise ValueError("Password is required")
+                raise ValueError("Password is required")
 
         # Solo validar formato si la contraseña NO está hasheada (bcrypt empieza con $2b$)
         if not self.password.startswith('$2b$'):
